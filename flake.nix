@@ -10,7 +10,7 @@
           addAttr = attrName: result: result ++ [{ name = attrName; value = attrs.${attrName}; }];
           allAttrs = builtins.attrNames attrs;
         in
-        builtins.foldl addAttr [ ] allAttrs;
+        builtins.foldl' addAttr [ ] allAttrs;
     in
     {
       # use lib keyword on outputs to expose nix functions
