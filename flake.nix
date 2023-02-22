@@ -1,7 +1,7 @@
 {
   description = "pure functions";
 
-  outputs = {}:
+  outputs = { ... }:
     let
       # input is a set of attrs and it is returned in array format
       # but deep copies all values.
