@@ -1,13 +1,23 @@
 {
-  description = "pure functions";
+  description = "nix utility functions";
+  inputs.nixpkgs.url = github:NixOS/nixpkgs?branch=master;
 
-  outputs = { ... }:
+  outputs = { nixpkgs, ... }:
     let
-      # input is a set of attrs and it is returned in array format
-      # but deep copies all values.
+      systems = [ "x86_64-linux" ];
+      l = nixpkgs.lib // builtins;
+
+      # do this for all systems
+      forAllSystems = f: l.genAttrs systems (
+        system: f system (nixpkgs.legacyPackages.${system})
+      );
+
+      # convert an attr set to an array
       attrsToArr = attrs:
         let
-          addAttr = attrName: result: result ++ [{ name = attrName; value = attrs.${attrName}; }];
+          addAttr = attrName: result: result ++ [
+            { name = attrName; value = attrs.${attrName}; }
+          ];
           allAttrs = builtins.attrNames attrs;
         in
         builtins.foldl' addAttr [ ] allAttrs;
@@ -15,7 +25,9 @@
     {
       # use lib keyword on outputs to expose nix functions
       lib = {
-        inherit attrsToArr;
+        inherit
+          attrsToArr
+          forAllSystems;
       };
     };
 }
